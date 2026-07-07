@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japon 2025 — Bagages</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--cream:#f7f3ed;--card:#fffdf9;--red:#c8372d;--gold:#c49a2e;
+  --muted:#7a6e63;--border:#ddd5c8;--green:#3a7d44;--blue:#2f6f8f;--brown:#7a6e63;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:'Noto Serif',serif;font-size:15px;line-height:1.55;padding-bottom:4rem;-webkit-text-size-adjust:100%}
+
+/* HEADER */
+.hdr{background:var(--ink);color:var(--cream);padding:1.9rem 1.25rem 1.5rem;text-align:center}
+.hdr .kanji{font-size:.85rem;opacity:.4;letter-spacing:.35em;margin-bottom:.5rem}
+.hdr h1{font-family:'Playfair Display',serif;font-size:1.55rem;letter-spacing:.02em;margin-bottom:.35rem}
+.hdr .sub{font-size:.76rem;color:var(--gold);letter-spacing:.06em}
+
+/* TABS */
+.tabs{position:sticky;top:0;z-index:60;background:var(--cream);border-bottom:1px solid var(--border);
+  display:flex;gap:.4rem;overflow-x:auto;padding:.7rem 1rem;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;background:var(--card);border:1px solid var(--border);color:var(--muted);
+  font-family:'Noto Serif',serif;font-size:.78rem;font-weight:600;padding:.5rem .9rem;border-radius:999px;
+  cursor:pointer;white-space:nowrap;transition:all .15s;letter-spacing:.02em}
+.tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+/* PROGRESS */
+.prog{max-width:760px;margin:0 auto;padding:1rem 1.25rem .2rem}
+.prog-bar{height:9px;background:#e7e0d4;border-radius:6px;overflow:hidden}
+.prog-fill{height:100%;width:0;border-radius:6px;transition:width .35s ease, background .2s}
+.prog-txt{font-size:.74rem;color:var(--muted);margin-top:.45rem;letter-spacing:.03em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
+.prog-global{font-style:italic;opacity:.85}
+
+/* SYNC TOOLBAR */
+.sync{max-width:760px;margin:.8rem auto 0;padding:0 1.25rem}
+.sync-row{display:flex;flex-wrap:wrap;gap:.5rem}
+.btn{font-family:'Noto Serif',serif;font-size:.76rem;font-weight:600;border-radius:8px;padding:.55rem .85rem;
+  cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--ink);transition:all .15s;letter-spacing:.02em}
+.btn:hover{border-color:var(--ink)}
+.btn-primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.btn-ghost{background:transparent;color:var(--muted)}
+.saved-note{font-size:.7rem;color:var(--muted);margin-top:.5rem;font-style:italic;min-height:1rem}
+.code-panel{display:none;margin-top:.7rem;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem}
+.code-panel.open{display:block}
+.code-panel label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-bottom:.4rem;text-transform:uppercase}
+.code-panel textarea{width:100%;min-height:64px;resize:vertical;font-family:monospace;font-size:.72rem;
+  border:1px solid var(--border);border-radius:7px;padding:.55rem;background:var(--cream);color:var(--ink);word-break:break-all}
+.code-panel .hint{font-size:.7rem;color:var(--muted);margin-top:.4rem;line-height:1.5}
+.code-actions{display:flex;gap:.5rem;margin-top:.55rem;flex-wrap:wrap}
+
+/* CONTENT */
+main{max-width:760px;margin:0 auto;padding:1.1rem 1rem 0}
+.bag{display:none}
+.bag.active{display:block}
+.sec{margin-bottom:1.4rem}
+.sec-h{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  padding:.3rem 0 .55rem;border-bottom:1px solid var(--border);margin-bottom:.55rem}
+.item{display:flex;align-items:flex-start;gap:.7rem;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--border);border-radius:9px;
+  padding:.6rem .75rem;margin-bottom:.35rem;cursor:pointer;font-family:'Noto Serif',serif;
+  color:var(--ink);transition:background .12s,border-color .12s,opacity .15s}
+.item:active{background:#f1ebe0}
+.box{flex:0 0 auto;width:19px;height:19px;border:2px solid var(--muted);border-radius:5px;
+  margin-top:1px;position:relative;transition:all .15s}
+.item.done .box{background:var(--accent,#3a7d44);border-color:var(--accent,#3a7d44)}
+.item.done .box::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:10px;
+  border:solid var(--cream);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.txt{flex:1;min-width:0}
+.i-main{font-size:.92rem;line-height:1.35}
+.i-detail{font-size:.76rem;color:var(--muted);margin-top:.15rem}
+.item.done .i-main{text-decoration:line-through;opacity:.55}
+.item.done .i-detail{opacity:.5}
+
+footer{max-width:760px;margin:2rem auto 0;padding:1.2rem 1.25rem;text-align:center;
+  font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.6}
+
+@media(min-width:600px){
+  .hdr h1{font-size:1.85rem}
+  .item{padding:.65rem .9rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="kanji">荷物 · 東京 · 箱根 · 京都 · 大阪</div>
+  <h1>Bagages — Japon</h1>
+  <div class="sub">18 juillet → 1er août 2025 · 2 adultes · 2 fils (11 &amp; 16 ans)</div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill" id="pf"></div></div>
+  <div class="prog-txt">
+    <span id="pt">0 / 0 articles préparés · 0%</span>
+    <span class="prog-global" id="pg"></span>
+  </div>
+</div>
+
+<div class="sync">
+  <div class="sync-row">
+    <button class="btn btn-primary" id="btnSave">💾 Sauvegarder / Transférer</button>
+    <button class="btn" id="btnLoad">📥 Charger un code</button>
+    <button class="btn btn-ghost" id="btnReset">Réinitialiser</button>
+  </div>
+  <div class="saved-note" id="savedNote"></div>
+
+  <div class="code-panel" id="panelSave">
+    <label>Ton code de transfert</label>
+    <textarea id="codeOut" readonly></textarea>
+    <div class="code-actions">
+      <button class="btn btn-primary" id="btnCopy">Copier le code</button>
+      <button class="btn btn-ghost" id="btnCloseSave">Fermer</button>
+    </div>
+    <div class="hint">Copie ce code, puis sur ton autre appareil ouvre ce même fichier → « Charger un code » → colle-le. Toutes tes cases se rechargeront à l'identique.</div>
+  </div>
+
+  <div class="code-panel" id="panelLoad">
+    <label>Colle ici le code d'un autre appareil</label>
+    <textarea id="codeIn" placeholder="Colle le code ici…"></textarea>
+    <div class="code-actions">
+      <button class="btn btn-primary" id="btnApply">Charger</button>
+      <button class="btn btn-ghost" id="btnCloseLoad">Fermer</button>
+    </div>
+    <div class="hint">Le code remplace l'état actuel de cette liste.</div>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  Sauvegarde automatique sur cet appareil à chaque case cochée · Pour passer d'un téléphone à un PC, utilise le code de transfert.<br>
+  Liste établie pour le voyage 18 juillet → 1er août 2025.
+</footer>
+
+<script>
+/* ============ DONNÉES ============ */
+const bags = [
+  { name:'Sac à dos 1', icon:'✈️', sub:'Adulte 1', color:'#c8372d', sections:[
+    { title:'Documents & argent', items:[
+      ['Passeports × 4','toute la famille'],
+      ['Photocopies passeports','séparées'],
+      ['Cartes bancaires × 2','banques différentes'],
+      ['Cash yens','¥50 000 minimum au départ'],
+      ['Carnet adresses hôtels','en japonais'],
+      ["Numéros d'urgence notés",''],
+    ]},
+    { title:'Tech', items:[
+      ['Téléphone + chargeur',''],
+      ['Batterie externe','20 000 mAh'],
+      ['Adaptateur prise','Type A'],
+      ['Multiprise compacte',''],
+      ['Écouteurs',''],
+      ['Appareil photo + chargeur',''],
+    ]},
+    { title:'Santé', items:[
+      ['Paracétamol',''],
+      ['Ibuprofène',''],
+      ['Antidiarrhéiques',''],
+      ['Antihistaminiques',''],
+      ['Pansements assortis',''],
+      ['Crème solaire SPF 50','grand format'],
+      ['Lingettes rafraîchissantes',''],
+      ['Mouchoirs en papier',''],
+    ]},
+    { title:'Kamikochi', items:[
+      ['Coupe-vent léger imperméable',''],
+      ['Gants légers','matin à 1 500 m'],
+    ]},
+    { title:'Rechange 24h — si retard Takkyubin', items:[
+      ['T-shirt × 1',''],
+      ['Sous-vêtement × 1',''],
+      ['Chaussettes × 1',''],
+    ]},
+  ]},
+
+  { name:'Sac à dos 2', icon:'🎒', sub:'Adulte 2', color:'#c49a2e', sections:[
+    { title:'Avion', items:[
+      ['Tablette ou liseuse','chargée, contenus téléchargés'],
+      ['Câbles tablette/liseuse',''],
+      ['Jeux de cartes',''],
+      ['Livre',''],
+      ['Snacks voyage','barres céréales, fruits secs'],
+      ['Masque de sommeil',''],
+      ["Bouchons d'oreilles",''],
+      ['Collant de compression','avion'],
+    ]},
+    { title:'Trousse toilette avion', items:[
+      ['Dentifrice format voyage',''],
+      ['Brosse à dents',''],
+      ['Sérum / crème visage','format 100 ml'],
+      ['Déodorant format voyage',''],
+      ['Couche légère','clim avion'],
+      ['T-shirt de rechange',''],
+    ]},
+    { title:'Enfants — avion', items:[
+      ['Écouteurs garçon 16 ans',''],
+      ['Écouteurs garçon 11 ans',''],
+      ['Jeux téléchargés hors-ligne','tablettes / téléphones'],
+      ['Carnets + stylos × 2',''],
+    ]},
+    { title:'Kamikochi & journées', items:[
+      ['Gourdes / bouteilles réutilisables × 4',''],
+      ['Sacs zip-lock étanches × 4','téléphones + docs'],
+      ['Serviettes microfibre × 2',''],
+    ]},
+  ]},
+
+  { name:'Grand sac', icon:'🧳', sub:'Adultes', color:'#3a7d44', sections:[
+    { title:'Adulte 1 — vêtements', items:[
+      ['T-shirts légers respirants × 6',''],
+      ['Shorts / pantalons légers × 3',''],
+      ['Tenue soirée × 1','robe ou pantalon lin'],
+      ['Manches longues légères × 1','temples + clim'],
+      ['Sous-vêtements × 7',''],
+      ['Chaussettes × 7',''],
+      ['Sous-vêtements thermiques légers × 1 set','Kamikochi'],
+      ['Chaussures marche faciles à enlever × 1',''],
+      ['Sandales légères soirée × 1',''],
+    ]},
+    { title:'Adulte 2 — vêtements', items:[
+      ['T-shirts légers respirants × 6',''],
+      ['Shorts / pantalons légers × 3',''],
+      ['Tenue soirée × 1',''],
+      ['Manches longues légères × 1',''],
+      ['Sous-vêtements × 7',''],
+      ['Chaussettes × 7',''],
+      ['Sous-vêtements thermiques légers × 1 set',''],
+      ['Chaussures marche faciles à enlever × 1',''],
+      ['Sandales légères soirée × 1',''],
+    ]},
+    { title:'Accessoires communs', items:[
+      ['Parapluies compacts × 2',''],
+      ['Chapeaux à bord large × 2',''],
+      ['Lunettes de soleil × 2',''],
+      ['Ceintures porte-monnaie plates × 2',''],
+    ]},
+    { title:'Toilette partagée', items:[
+      ['Shampoing format voyage × 1',''],
+      ['Après-shampoing format voyage × 1',''],
+      ['Gel douche format voyage × 1',''],
+      ['Rasoir',''],
+      ['Produits spécifiques',''],
+    ]},
+  ]},
+
+  { name:'Grand sac', icon:'👟', sub:'Garçons', color:'#2f6f8f', sections:[
+    { title:'Garçon 16 ans — vêtements', items:[
+      ['T-shirts × 6',''],
+      ['Shorts × 3',''],
+      ['Jean / pantalon soirée × 1',''],
+      ['Sweat léger × 1','clim + Kamikochi'],
+      ['Sous-vêtements × 7',''],
+      ['Chaussettes × 7',''],
+      ['Chaussures marche × 1','à enlever facilement'],
+      ['⚠️ Prévoir de la place pour les achats','Harajuku / Den Den Town'],
+      ['Vieux t-shirts à laisser au Japon × 2-3',''],
+    ]},
+    { title:'Garçon 11 ans — vêtements', items:[
+      ['T-shirts × 6',''],
+      ['Shorts × 4',''],
+      ['Pantalon léger long × 1','temples + soirées Kamikochi'],
+      ['Sweat léger × 1',''],
+      ['Sous-vêtements × 7',''],
+      ['Chaussettes × 7',''],
+      ['Chaussures marche × 1','à enlever facilement'],
+    ]},
+    { title:'Tech & divertissement', items:[
+      ['Console portable + chargeur',''],
+      ['Jeux console',''],
+      ['Pochettes à monnaie × 2','budget yens garçons'],
+      ['Carnets de voyage × 2',''],
+      ['Stylos × 4',''],
+    ]},
+    { title:'Santé enfants', items:[
+      ['Médicaments traitements en cours',''],
+      ['Thermomètre',''],
+      ['Crème solaire dédiée enfants',''],
+      ['Crème anti-moustiques',''],
+    ]},
+    { title:'Kamikochi partagé', items:[
+      ['Crème solaire format moyen × 1',''],
+    ]},
+  ]},
+
+  { name:'Ne PAS emporter', icon:'🚫', sub:'à laisser', color:'#7a6e63', sections:[
+    { title:'À laisser à la maison', items:[
+      ['Serviettes de bain','fournies par tous les hôtels + Airbnb'],
+      ['Sèche-cheveux','fourni partout'],
+      ['Livres papier lourds','liseuse uniquement'],
+      ['Parapluie grand format','compacts suffisent + transparent ¥500 au konbini'],
+      ['Produits de toilette en grande quantité','konbini = tout en format voyage ¥200-400'],
+      ['Adaptateurs multiples','1 adaptateur + 1 multiprise suffit'],
+    ]},
+  ]},
+];
+
+/* ============ ÉTAT + PERSISTANCE ============ */
+const LS_KEY='bagages_japon_2025';
+let state={};
+let current=0;
+
+function saveLocal(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    localStorage.setItem(LS_KEY+'_ts', new Date().toISOString());
+    showSaved();
+    return true;
+  }catch(e){ return false; }
+}
+function loadLocal(){
+  try{
+    const s=localStorage.getItem(LS_KEY);
+    if(s) state=JSON.parse(s)||{};
+  }catch(e){ state={}; }
+}
+function showSaved(){
+  const n=document.getElementById('savedNote');
+  try{
+    const ts=localStorage.getItem(LS_KEY+'_ts');
+    if(ts){
+      const d=new Date(ts);
+      n.textContent='Sauvegardé sur cet appareil · '+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    }
+  }catch(e){ n.textContent='Sauvegarde locale indisponible ici — utilise le code de transfert.'; }
+}
+
+/* ---- Encodage compact pour le code de transfert ---- */
+function allIds(){
+  const ids=[];
+  bags.forEach((b,bi)=>b.sections.forEach((s,si)=>s.items.forEach((it,ii)=>ids.push('b'+bi+'_s'+si+'_i'+ii))));
+  return ids;
+}
+function encodeState(){
+  const ids=allIds();
+  let bits='';
+  ids.forEach(id=>bits+= state[id]?'1':'0');
+  const bytes=[];
+  for(let i=0;i<bits.length;i+=8) bytes.push(parseInt(bits.substr(i,8).padEnd(8,'0'),2));
+  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return 'JP1-'+btoa(bin);
+}
+function decodeState(code){
+  try{
+    code=(code||'').trim().replace(/^JP1-/,'');
+    const bin=atob(code);
+    let bits='';
+    for(let i=0;i<bin.length;i++) bits+=bin.charCodeAt(i).toString(2).padStart(8,'0');
+    const ids=allIds(); const ns={};
+    ids.forEach((id,idx)=>{ if(bits[idx]==='1') ns[id]=true; });
+    return ns;
+  }catch(e){ return null; }
+}
+
+/* ============ RENDU ============ */
+function renderTabs(){
+  const t=document.getElementById('tabs'); t.innerHTML='';
+  bags.forEach((b,bi)=>{
+    const btn=document.createElement('button');
+    btn.className='tab'+(bi===current?' active':'');
+    btn.textContent=b.icon+' '+b.name+(b.sub?' · '+b.sub:'');
+    btn.onclick=()=>{ current=bi; renderTabs(); renderBag(); update(); };
+    t.appendChild(btn);
+  });
+}
+
+function renderBag(){
+  const m=document.getElementById('main'); m.innerHTML='';
+  const bag=bags[current];
+  const wrap=document.createElement('div'); wrap.className='bag active';
+  bag.sections.forEach((sec,si)=>{
+    const s=document.createElement('div'); s.className='sec';
+    const h=document.createElement('div'); h.className='sec-h';
+    h.style.color=bag.color; h.textContent=sec.title;
+    s.appendChild(h);
+    sec.items.forEach((it,ii)=>{
+      const id='b'+current+'_s'+si+'_i'+ii;
+      const btn=document.createElement('button');
+      btn.className='item'+(state[id]?' done':'');
+      btn.style.setProperty('--accent',bag.color);
+      btn.innerHTML='<span class="box"></span><span class="txt"><span class="i-main">'+it[0]+'</span>'+(it[1]?'<span class="i-detail">'+it[1]+'</span>':'')+'</span>';
+      btn.onclick=()=>{ state[id]=!state[id]; btn.classList.toggle('done'); saveLocal(); update(); };
+      s.appendChild(btn);
+    });
+    wrap.appendChild(s);
+  });
+  m.appendChild(wrap);
+}
+
+function update(){
+  // progression du sac courant
+  let bt=0,bd=0;
+  bags[current].sections.forEach((sec,si)=>sec.items.forEach((it,ii)=>{
+    bt++; if(state['b'+current+'_s'+si+'_i'+ii]) bd++;
+  }));
+  const bpct=bt?Math.round(bd/bt*100):0;
+  const pf=document.getElementById('pf');
+  pf.style.width=bpct+'%';
+  pf.style.background=bags[current].color;
+  document.getElementById('pt').textContent=bd+' / '+bt+' articles · '+bpct+'%';
+  // progression globale
+  let gt=0,gd=0;
+  bags.forEach((b,bi)=>b.sections.forEach((sec,si)=>sec.items.forEach((it,ii)=>{
+    gt++; if(state['b'+bi+'_s'+si+'_i'+ii]) gd++;
+  })));
+  document.getElementById('pg').textContent='Total voyage : '+gd+' / '+gt;
+}
+
+/* ============ ACTIONS ============ */
+document.getElementById('btnSave').onclick=()=>{
+  saveLocal();
+  document.getElementById('codeOut').value=encodeState();
+  document.getElementById('panelSave').classList.add('open');
+  document.getElementById('panelLoad').classList.remove('open');
+};
+document.getElementById('btnLoad').onclick=()=>{
+  document.getElementById('panelLoad').classList.add('open');
+  document.getElementById('panelSave').classList.remove('open');
+  document.getElementById('codeIn').focus();
+};
+document.getElementById('btnCloseSave').onclick=()=>document.getElementById('panelSave').classList.remove('open');
+document.getElementById('btnCloseLoad').onclick=()=>document.getElementById('panelLoad').classList.remove('open');
+
+document.getElementById('btnCopy').onclick=async()=>{
+  const ta=document.getElementById('codeOut');
+  const btn=document.getElementById('btnCopy');
+  try{
+    await navigator.clipboard.writeText(ta.value);
+    btn.textContent='✓ Copié';
+  }catch(e){
+    ta.focus(); ta.select();
+    try{ document.execCommand('copy'); btn.textContent='✓ Copié'; }
+    catch(e2){ btn.textContent='Sélectionne et copie'; }
+  }
+  setTimeout(()=>btn.textContent='Copier le code',1800);
+};
+
+document.getElementById('btnApply').onclick=()=>{
+  const code=document.getElementById('codeIn').value;
+  const ns=decodeState(code);
+  if(!ns){ alert("Code non reconnu. Vérifie que tu as bien copié le code entier (il commence par « JP1- »)."); return; }
+  state=ns; saveLocal();
+  document.getElementById('panelLoad').classList.remove('open');
+  document.getElementById('codeIn').value='';
+  renderBag(); update();
+};
+
+document.getElementById('btnReset').onclick=()=>{
+  if(confirm('Réinitialiser toutes les cases de tous les sacs ?')){
+    state={}; saveLocal(); renderBag(); update();
+  }
+};
+
+/* ============ INIT ============ */
+loadLocal();
+renderTabs();
+renderBag();
+update();
+showSaved();
+</script>
+</body>
+</html>
