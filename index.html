@@ -53,12 +53,6 @@ footer{text-align:center;padding:1.5rem 1rem;font-size:.72rem;color:var(--muted)
 .btn-ghost{background:transparent;color:var(--muted)}
 .btn-ghost:hover{border-color:var(--red);color:var(--red)}
 .saved-note{font-size:.68rem;color:var(--muted);margin-top:.45rem;font-style:italic;min-height:.9rem}
-.code-panel{display:none;margin-top:.6rem;background:#fff;border:1px solid var(--border);border-radius:.5rem;padding:.85rem}
-.code-panel.open{display:block}
-.code-panel label{display:block;font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.4rem}
-.code-panel textarea{width:100%;min-height:60px;resize:vertical;font-family:monospace;font-size:.72rem;border:1px solid var(--border);border-radius:.4rem;padding:.5rem;background:var(--cream);color:var(--ink);word-break:break-all}
-.code-actions{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap}
-.code-hint{font-size:.7rem;color:var(--muted);margin-top:.4rem;line-height:1.5}
 </style>
 </head>
 <body>
@@ -76,37 +70,15 @@ footer{text-align:center;padding:1.5rem 1rem;font-size:.72rem;color:var(--muted)
 
 <div class="sync">
   <div class="sync-row">
-    <button class="btn btn-primary" id="btnSave">💾 Sauvegarder / Transférer</button>
-    <button class="btn" id="btnLoad">📥 Charger un code</button>
+    <button class="btn btn-primary" id="btnSave">💾 Sauvegarder</button>
   </div>
   <div class="saved-note" id="savedNote"></div>
-
-  <div class="code-panel" id="panelSave">
-    <label>Ton code de transfert</label>
-    <textarea id="codeOut" readonly></textarea>
-    <div class="code-actions">
-      <button class="btn btn-primary" id="btnCopy">Copier le code</button>
-      <button class="btn btn-ghost" id="btnCloseSave">Fermer</button>
-    </div>
-    <div class="code-hint">Copie ce code, ouvre ce même fichier sur ton autre appareil → « Charger un code » → colle-le. Toutes tes cases se rechargent à l'identique.</div>
-  </div>
-
-  <div class="code-panel" id="panelLoad">
-    <label>Colle ici le code d'un autre appareil</label>
-    <textarea id="codeIn" placeholder="Colle le code ici…"></textarea>
-    <div class="code-actions">
-      <button class="btn btn-primary" id="btnApply">Charger</button>
-      <button class="btn btn-ghost" id="btnCloseLoad">Fermer</button>
-    </div>
-    <div class="code-hint">Le code remplace l'état actuel de cette liste.</div>
-  </div>
 </div>
 
 <main id="main"></main>
 
 <footer>
 Sauvegarde automatique sur cet appareil à chaque case cochée.<br>
-Pour passer du téléphone au PC : bouton « Sauvegarder / Transférer ».<br>
 <button class="reset" onclick="resetAll()">Réinitialiser</button>
 </footer>
 
@@ -292,31 +264,6 @@ function showSaved(){
   }catch(e){ n.textContent='Enregistrement local indisponible ici — utilise le code de transfert.'; }
 }
 
-/* ---------- Code de transfert (encodage compact) ---------- */
-function allIds(){
-  const ids=[];
-  bags.forEach((b,bi)=>b.sections.forEach((s,si)=>s.items.forEach((it,ii)=>ids.push(`b${bi}_s${si}_i${ii}`))));
-  return ids;
-}
-function encodeState(){
-  const ids=allIds(); let bits='';
-  ids.forEach(id=>bits+= state[id]?'1':'0');
-  const bytes=[];
-  for(let i=0;i<bits.length;i+=8) bytes.push(parseInt(bits.substr(i,8).padEnd(8,'0'),2));
-  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
-  return 'JP1-'+btoa(bin);
-}
-function decodeState(code){
-  try{
-    code=(code||'').trim().replace(/^JP1-/,'');
-    const bin=atob(code); let bits='';
-    for(let i=0;i<bin.length;i++) bits+=bin.charCodeAt(i).toString(2).padStart(8,'0');
-    const ids=allIds(); const ns={};
-    ids.forEach((id,idx)=>{ if(bits[idx]==='1') ns[id]=true; });
-    return ns;
-  }catch(e){ return null; }
-}
-
 /* ---------- Rendu ---------- */
 function render(){
   document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',i===current));
@@ -353,35 +300,12 @@ function update(){
 
 function resetAll(){ if(confirm('Réinitialiser toutes les cases ?')){ Object.keys(state).forEach(k=>delete state[k]); saveLocal(); render(); } }
 
-/* ---------- Actions sauvegarde / transfert ---------- */
+/* ---------- Action sauvegarde ---------- */
 document.getElementById('btnSave').onclick=()=>{
-  saveLocal();
-  document.getElementById('codeOut').value=encodeState();
-  document.getElementById('panelSave').classList.add('open');
-  document.getElementById('panelLoad').classList.remove('open');
-};
-document.getElementById('btnLoad').onclick=()=>{
-  document.getElementById('panelLoad').classList.add('open');
-  document.getElementById('panelSave').classList.remove('open');
-  document.getElementById('codeIn').focus();
-};
-document.getElementById('btnCloseSave').onclick=()=>document.getElementById('panelSave').classList.remove('open');
-document.getElementById('btnCloseLoad').onclick=()=>document.getElementById('panelLoad').classList.remove('open');
-document.getElementById('btnCopy').onclick=async()=>{
-  const ta=document.getElementById('codeOut'), b=document.getElementById('btnCopy');
-  try{ await navigator.clipboard.writeText(ta.value); b.textContent='✓ Copié'; }
-  catch(e){ ta.focus(); ta.select(); try{ document.execCommand('copy'); b.textContent='✓ Copié'; }catch(e2){ b.textContent='Sélectionne et copie'; } }
-  setTimeout(()=>b.textContent='Copier le code',1800);
-};
-document.getElementById('btnApply').onclick=()=>{
-  const ns=decodeState(document.getElementById('codeIn').value);
-  if(!ns){ alert("Code non reconnu. Vérifie que tu as copié le code entier (il commence par « JP1- »)."); return; }
-  Object.keys(state).forEach(k=>delete state[k]);
-  Object.assign(state, ns);
-  saveLocal();
-  document.getElementById('panelLoad').classList.remove('open');
-  document.getElementById('codeIn').value='';
-  render();
+  const b=document.getElementById('btnSave');
+  const ok=saveLocal();
+  b.textContent = ok ? '✓ Sauvegardé' : '⚠️ Non enregistré';
+  setTimeout(()=>b.textContent='💾 Sauvegarder',1600);
 };
 
 /* ---------- Init ---------- */
